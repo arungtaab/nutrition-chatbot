@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.venv/
+
+# Database and vector store
+*.db
+chroma_db/
+
+# Node
+node_modules/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE / OS
+.idea/
+.DS_Store
+*.swp
+*.swo
+
+# Build outputs
+dist/
+build/
+*.egg-info/
+.eggs/
