@@ -20,7 +20,13 @@ from config import (
     SAMPLE_DOCS_DIR,
 )
 
-SYSTEM_PROMPT = """You are a nutrition-oriented Food Planner assistant. Use only the context below to support your answers. Recommend foods and meals based on nutrition and the user's stated preferences or restrictions. Explain briefly why you recommend each food or meal (e.g. nutrients, balance). If the question is not about food or nutrition, politely redirect to meal planning and nutrition."""
+SYSTEM_PROMPT = """You are a nutrition-oriented Food Planner assistant. Use only the context below to support your answers—if context is thin, say so and avoid inventing precise nutrient claims.
+
+When the user asks for meal ideas, give 2–3 concrete options with short "because…" rationales (nutrients, balance, constraints).
+
+Recommend meals based on nutrition and the user's stated preferences or restrictions. For medical diagnosis, treatment, or medication questions, do not advise; suggest consulting a qualified professional.
+
+If the question is not about food or nutrition, politely redirect to meal planning and nutrition."""
 
 
 def _backend_dir():
@@ -127,6 +133,10 @@ def ingest_docs(docs_dir: pathlib.Path = None):
     texts = [c[0] for c in chunks_with_meta]
     vectors = embed_with_ollama(texts)
     client = get_client()
+    try:
+        client.delete_collection(CHROMA_COLLECTION)
+    except Exception:
+        pass
     coll = ensure_collection(client)
     ids = [f"doc_{i}" for i in range(len(texts))]
     metadatas = [{"source": c[1]} for c in chunks_with_meta]

@@ -4,6 +4,7 @@ from flask_cors import CORS
 
 from config import CORS_ORIGINS, FLASK_HOST, FLASK_PORT
 from database import init_db, save_message, get_history
+from errors import api_error
 from rag_service import chat, ingest_docs
 
 app = Flask(__name__)
@@ -19,19 +20,19 @@ def _ensure_db():
 def api_chat():
     data = request.get_json()
     if not data or "message" not in data:
-        return jsonify({"error": "Missing 'message' in body"}), 400
+        return jsonify(api_error("Missing 'message' in body", "validation_error")), 400
     message = (data.get("message") or "").strip()
     if not message:
-        return jsonify({"error": "Message cannot be empty"}), 400
+        return jsonify(api_error("Message cannot be empty", "validation_error")), 400
 
     conversation_id = (data.get("conversation_id") or "").strip() or str(uuid.uuid4())
 
     try:
         reply = chat(message)
     except RuntimeError as e:
-        return jsonify({"error": str(e)}), 503
+        return jsonify(api_error(str(e), "ollama_unavailable")), 503
     except Exception as e:
-        return jsonify({"error": f"RAG error: {e}"}), 500
+        return jsonify(api_error(f"RAG error: {e}", "rag_error")), 500
 
     try:
         save_message(conversation_id, "user", message)
@@ -56,9 +57,9 @@ def api_ingest():
             count = ingest_docs()
         return jsonify({"ingested": count})
     except RuntimeError as e:
-        return jsonify({"error": str(e)}), 503
+        return jsonify(api_error(str(e), "ollama_unavailable")), 503
     except Exception as e:
-        return jsonify({"error": f"Ingest error: {e}"}), 500
+        return jsonify(api_error(f"Ingest error: {e}", "rag_error")), 500
 
 
 @app.route("/api/history/<conversation_id>", methods=["GET"])

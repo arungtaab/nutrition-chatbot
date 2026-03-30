@@ -31,3 +31,11 @@ dist/
 build/
 *.egg-info/
 .eggs/
+
+# Test / tooling
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Local secrets (frontend)
+frontend/.env.local

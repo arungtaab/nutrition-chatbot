@@ -15,7 +15,12 @@ DB_PATH = os.environ.get("DB_PATH", "chat_history.db")
 # Flask
 FLASK_HOST = os.environ.get("FLASK_HOST", "0.0.0.0")
 FLASK_PORT = int(os.environ.get("FLASK_PORT", "5000"))
-CORS_ORIGINS = ["http://localhost:5173"]
+_default_origins = "http://localhost:5173,http://127.0.0.1:5173"
+CORS_ORIGINS = [
+    o.strip()
+    for o in os.environ.get("CORS_ORIGINS", _default_origins).split(",")
+    if o.strip()
+]
 
 # RAG
 CHUNK_SIZE = 500
