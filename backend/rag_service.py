@@ -89,25 +89,30 @@ def load_docs(docs_dir: pathlib.Path):
 
 
 def embed_with_ollama(texts: list[str]) -> list[list[float]]:
-    """Call Ollama /api/embed for each text (or batch if supported). Returns list of vectors."""
-    vectors = []
+    """Call Ollama /api/embed: `input` (string or list) and response `embeddings` (see Ollama docs)."""
+    if not texts:
+        return []
     url = f"{OLLAMA_HOST.rstrip('/')}/api/embed"
-    for text in texts:
-        try:
-            r = requests.post(
-                url,
-                json={"model": OLLAMA_EMBED_MODEL, "prompt": text},
-                timeout=60,
-            )
-            r.raise_for_status()
-            data = r.json()
-            if "embedding" in data:
-                vectors.append(data["embedding"])
-            else:
-                raise ValueError("Ollama embed response missing 'embedding'")
-        except requests.RequestException as e:
-            raise RuntimeError(f"Ollama embed request failed: {e}") from e
-    return vectors
+    try:
+        r = requests.post(
+            url,
+            json={"model": OLLAMA_EMBED_MODEL, "input": texts},
+            timeout=120,
+        )
+        r.raise_for_status()
+        data = r.json()
+        if "embeddings" in data and data["embeddings"] is not None:
+            vecs = data["embeddings"]
+            if len(vecs) != len(texts):
+                raise ValueError(
+                    f"Ollama returned {len(vecs)} embeddings for {len(texts)} inputs"
+                )
+            return [list(v) for v in vecs]
+        if "embedding" in data and len(texts) == 1:
+            return [list(data["embedding"])]
+        raise ValueError("Ollama embed response missing 'embeddings' (or legacy 'embedding')")
+    except requests.RequestException as e:
+        raise RuntimeError(f"Ollama embed request failed: {e}") from e
 
 
 def get_client():

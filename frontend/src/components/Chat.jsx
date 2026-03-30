@@ -2,9 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { sendMessage } from "../api.js";
 
 const SUGGESTIONS = [
-  "High-protein vegetarian dinner ideas — explain why each works.",
-  "Low-sodium lunch I can prep in 30 minutes.",
-  "Three breakfast ideas with more protein and why.",
+  "High-protein vegetarian dinners—three ideas and why they work.",
+  "A low-sodium lunch I can prep in under 30 minutes.",
+  "Breakfast ideas with more protein, kept simple for busy mornings.",
 ];
 
 export default function Chat() {
@@ -53,14 +53,14 @@ export default function Chat() {
   }
 
   return (
-    <section className="chat-shell chrome-card" aria-label="Chat">
-      <div className="messages" ref={listRef}>
+    <section className="message-dock" aria-label="Chat">
+      <div className="message-dock-messages" ref={listRef}>
         {messages.length === 0 && !loading && (
           <div className="message-empty-wrap">
             <p className="message-empty">
-              Ask for meal ideas, nutrition tips, or an explanation of a
-              recommendation. Grounded answers use your local knowledge base
-              after ingest.
+              Ask for meal ideas, gentle nutrition tips, or a clearer take on a
+              recommendation. If your project ingests docs, answers can draw on
+              that knowledge base.
             </p>
             <div className="suggestions">
               {SUGGESTIONS.map((s) => (
@@ -80,18 +80,20 @@ export default function Chat() {
           <div
             key={idx}
             className={
-              m.role === "user" ? "message message-user" : "message message-assistant"
+              m.role === "user"
+                ? "message message-user"
+                : "message message-assistant"
             }
           >
             <div className="message-role">
-              {m.role === "user" ? "You" : "Food Planner"}
+              {m.role === "user" ? "You" : "Companion"}
             </div>
             <div className="message-content">{m.content}</div>
           </div>
         ))}
         {loading && (
           <div className="message message-assistant loading-msg">
-            <div className="message-role">Food Planner</div>
+            <div className="message-role">Companion</div>
             <div className="message-content muted">Thinking…</div>
           </div>
         )}
@@ -101,20 +103,22 @@ export default function Chat() {
           {error}
         </div>
       )}
-      <form className="input-row" onSubmit={onSubmit}>
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask for meal ideas, nutrition tips, or explain a recommendation…"
-          autoComplete="off"
-          disabled={loading}
-          aria-label="Message"
-        />
-        <button type="submit" disabled={loading || !input.trim()}>
-          {loading ? "…" : "Send"}
-        </button>
-      </form>
+      <div className="message-dock-composer">
+        <form className="dock-form" onSubmit={onSubmit}>
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Ask about meals, swaps, or nutrition in plain language…"
+            autoComplete="off"
+            disabled={loading}
+            aria-label="Message"
+          />
+          <button type="submit" disabled={loading || !input.trim()}>
+            {loading ? "…" : "Send"}
+          </button>
+        </form>
+      </div>
     </section>
   );
 }
