@@ -1,0 +1,5 @@
+# SPA fallback for Netlify (same idea as frontend/vercel.json)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

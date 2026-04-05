@@ -1,19 +1,21 @@
-Dietary guidelines and meal structure
+Dietary guidelines — why this bundle exists, and who else can use it
 
-A balanced diet supports overall health and helps maintain a healthy weight. Meals are typically structured around three main eating occasions: breakfast, lunch, and dinner, with optional healthy snacks in between.
+**Why I wrote this:** I eat **vegetarian** with **no meat, poultry, fish, or eggs**—dairy’s fine for me, but adjust if you’re vegan. I wanted guidelines I could point a RAG corpus at without pretending one plate fits every culture or budget.
 
-Key principles:
-- Fill half your plate with vegetables and fruits. Aim for variety and colour.
-- Choose whole grains (e.g. brown rice, oats, whole-wheat bread) for at least half of your grain intake.
-- Include a source of lean protein at each meal: poultry, fish, legumes, eggs, or tofu.
-- Add healthy fats in moderation: nuts, seeds, avocado, olive oil.
-- Limit added sugars, sodium, and highly processed foods.
+**If you eat differently:** same skeleton still helps—veg-heavy plates, whole grains, purposeful protein—just swap the protein lines for chicken, fish, eggs, or whatever matches your ethics and health plan.
 
-Portion control and regular meal timing can help with energy levels and appetite. Eating at roughly the same times each day supports digestion and can make it easier to plan nutritious meals.
+Patterns that hold up for most people:
+- Roughly **half** vegetables and fruit (fresh, frozen, canned all count).
+- **Whole grains** when practical: oats, brown rice, breads that are actually whole grain.
+- **Protein every meal** — for my lane: legumes, tofu, tempeh, dairy if you use it, nuts/seeds in sensible amounts. For omnivores: add lean meats, fish, eggs as fits.
+- **Fats on purpose:** olive oil, avocado, tahini, nuts—so meals satisfy and carry flavor.
+- **Sugar / salt / ultra-processed:** moderation, not a morality play.
 
-For most adults, a typical day might include:
-- Breakfast: whole grains, protein, and fruit (e.g. oatmeal with nuts and berries).
-- Lunch: vegetables, lean protein, and a whole-grain side (e.g. salad with grilled chicken and quinoa).
-- Dinner: similar balance with vegetables, protein, and a starch or grain, keeping portions moderate.
+Regular-ish meal times beat skipping lunch and panic-snacking at 4 p.m.—speaking from experience.
 
-Adapt these guidelines to your calorie needs, activity level, and any medical or dietary restrictions. A healthcare provider or dietitian can help tailor a plan.
+Rough day sketch (tweak portions and foods to you):
+- Breakfast: grains + protein + fruit (e.g. oatmeal with nut butter and berries; or eggs and toast if that’s your household).
+- Lunch: vegetables + protein + grain (bowl, sandwich with salad, leftovers).
+- Dinner: same idea—balance, not performance.
+
+Allergies, pregnancy, chronic conditions, meds: a clinician or registered dietitian beats any text file I dropped in a repo.

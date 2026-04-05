@@ -43,3 +43,38 @@ export async function sendMessage(message, conversationId) {
 
   return data;
 }
+
+/**
+ * @param {string} conversationId
+ * @returns {Promise<Array<{ id: number, role: string, content: string }>>}
+ */
+export async function fetchHistory(conversationId) {
+  const url = `${API_BASE_URL}/api/history/${encodeURIComponent(
+    conversationId,
+  )}?limit=100`;
+
+  let res;
+  try {
+    res = await fetch(url);
+  } catch (e) {
+    throw new Error(
+      e instanceof Error
+        ? e.message
+        : "Network error — is the API running on " + API_BASE_URL + "?",
+    );
+  }
+
+  let data = {};
+  try {
+    data = await res.json();
+  } catch {
+    /* ignore */
+  }
+
+  if (!res.ok) {
+    const msg = data.error || `Request failed (${res.status})`;
+    throw new Error(msg);
+  }
+
+  return Array.isArray(data.messages) ? data.messages : [];
+}

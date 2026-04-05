@@ -29,3 +29,25 @@ TOP_K = 5
 
 # Sample docs path (relative to backend dir)
 SAMPLE_DOCS_DIR = "sample_docs"
+
+
+def _env_bool(name: str, default: bool = False) -> bool:
+    v = os.environ.get(name, "").strip().lower()
+    if not v:
+        return default
+    return v in ("1", "true", "yes", "on")
+
+
+# Production hardening
+# If set, POST /api/ingest requires header X-Ingest-Secret: <value>
+INGEST_SECRET = os.environ.get("INGEST_SECRET", "").strip()
+# If true, ingest is disabled (403)
+DISABLE_INGEST = _env_bool("DISABLE_INGEST", False)
+# Rate limit for POST /api/chat, e.g. "60 per minute"
+CHAT_RATE_LIMIT = (
+    os.environ.get("CHAT_RATE_LIMIT", "60 per minute").strip() or "60 per minute"
+)
+# Set true in production; default off for local dev
+RATE_LIMIT_ENABLED = _env_bool("RATE_LIMIT_ENABLED", False)
+# User-facing generic message for unexpected 500s (set in production)
+HIDE_INTERNAL_ERRORS = _env_bool("HIDE_INTERNAL_ERRORS", False)

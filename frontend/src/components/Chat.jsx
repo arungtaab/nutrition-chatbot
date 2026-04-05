@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { sendMessage } from "../api.js";
+import { fetchHistory, sendMessage } from "../api.js";
+
+const STORAGE_KEY = "nutrition_chat_conversation_id";
 
 const SUGGESTIONS = [
   "High-protein vegetarian dinners—three ideas and why they work.",
@@ -7,18 +9,59 @@ const SUGGESTIONS = [
   "Breakfast ideas with more protein, kept simple for busy mornings.",
 ];
 
+function prefersReducedMotion() {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
 export default function Chat() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [conversationId, setConversationId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [hydrating, setHydrating] = useState(true);
   const [error, setError] = useState(null);
   const listRef = useRef(null);
 
   useEffect(() => {
+    let cancelled = false;
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (!stored) {
+      setHydrating(false);
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    (async () => {
+      try {
+        const rows = await fetchHistory(stored);
+        if (cancelled) return;
+        setConversationId(stored);
+        setMessages(
+          rows.map((r) => ({
+            id: r.id,
+            role: r.role,
+            content: r.content,
+          })),
+        );
+      } catch {
+        if (!cancelled) localStorage.removeItem(STORAGE_KEY);
+      } finally {
+        if (!cancelled) setHydrating(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    const behavior = prefersReducedMotion() ? "auto" : "smooth";
     listRef.current?.scrollTo({
       top: listRef.current.scrollHeight,
-      behavior: "smooth",
+      behavior,
     });
   }, [messages, loading]);
 
@@ -35,6 +78,7 @@ export default function Chat() {
     try {
       const res = await sendMessage(trimmed, conversationId);
       setConversationId(res.conversation_id);
+      localStorage.setItem(STORAGE_KEY, res.conversation_id);
       setMessages((prev) => [
         ...prev,
         { role: "assistant", content: res.reply },
@@ -52,10 +96,18 @@ export default function Chat() {
     setInput(text);
   }
 
+  const showEmptyState =
+    messages.length === 0 && !loading && !hydrating;
+
   return (
     <section className="message-dock" aria-label="Chat">
       <div className="message-dock-messages" ref={listRef}>
-        {messages.length === 0 && !loading && (
+        {hydrating && (
+          <p className="message-empty muted" role="status">
+            Loading your conversation…
+          </p>
+        )}
+        {showEmptyState && (
           <div className="message-empty-wrap">
             <p className="message-empty">
               Ask for meal ideas, gentle nutrition tips, or a clearer take on a
@@ -78,7 +130,9 @@ export default function Chat() {
         )}
         {messages.map((m, idx) => (
           <div
-            key={idx}
+            key={
+              m.id != null ? `${m.role}-${m.id}` : `${idx}-${m.role}-${m.content?.slice(0, 12)}`
+            }
             className={
               m.role === "user"
                 ? "message message-user"
@@ -86,14 +140,14 @@ export default function Chat() {
             }
           >
             <div className="message-role">
-              {m.role === "user" ? "You" : "Companion"}
+              {m.role === "user" ? "You" : "Nourish"}
             </div>
             <div className="message-content">{m.content}</div>
           </div>
         ))}
         {loading && (
           <div className="message message-assistant loading-msg">
-            <div className="message-role">Companion</div>
+            <div className="message-role">Nourish</div>
             <div className="message-content muted">Thinking…</div>
           </div>
         )}
@@ -111,10 +165,10 @@ export default function Chat() {
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask about meals, swaps, or nutrition in plain language…"
             autoComplete="off"
-            disabled={loading}
+            disabled={loading || hydrating}
             aria-label="Message"
           />
-          <button type="submit" disabled={loading || !input.trim()}>
+          <button type="submit" disabled={loading || hydrating || !input.trim()}>
             {loading ? "…" : "Send"}
           </button>
         </form>

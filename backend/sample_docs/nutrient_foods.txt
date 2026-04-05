@@ -1,32 +1,33 @@
-Nutrient content of common foods and pantry staples
+Nutrient cheat sheet — pantry staples (vegetarian origin, mixed-eater friendly)
 
-Knowing the nutrient profile of everyday foods helps you build balanced meals and meet goals like more protein, fibre, or specific vitamins.
+This list started because I plan **vegetarian** plates with **no meat, fish, poultry, or eggs** and still ask: **where’s the protein? fiber? something besides white carbs?** I added a short **animal-protein** column so roommates, partners, or clone-and-share users can query omnivore meals and still hit the same RAG bundle.
 
 Grains and starches
-- Oats: fibre, B vitamins, magnesium; support satiety and heart health.
-- Brown rice: fibre, manganese; more nutrients than white rice.
-- Quinoa: complete protein, fibre, iron; good for vegetarian meals.
-- Whole-wheat bread and pasta: fibre and B vitamins when 100% whole grain.
+- Oats: fiber, B vitamins, magnesium; satiety.
+- Brown rice: fiber, manganese.
+- Quinoa: complete plant protein, fiber, iron.
+- Whole-wheat bread/pasta: read labels—true whole grain, not marketing flour.
 
-Proteins
-- Chicken breast: lean protein, B vitamins, low fat when skinless.
-- Eggs: high-quality protein, choline, vitamin D, B12.
-- Lentils and chickpeas: plant protein, fibre, iron, folate; versatile and filling.
-- Salmon and fatty fish: omega-3 fatty acids, protein, vitamin D; support heart and brain health.
-- Greek yogurt: protein, calcium, probiotics; choose plain to limit added sugar.
-- Tofu and tempeh: plant protein, calcium (if set with calcium); suitable for vegetarian and vegan diets.
+Plant proteins (my default)
+- Lentils, chickpeas, beans: protein, fiber, iron/folate; cheap and batchable.
+- Tofu and tempeh: protein; calcium if calcium-set.
+- Greek yogurt, cottage cheese (if dairy works for you): protein, calcium.
+- Nuts and seeds: protein and fat—portion-aware.
 
-Vegetables and fruits
-- Leafy greens (spinach, kale): vitamins A, C, K, folate, iron; low calorie, high nutrient density.
-- Broccoli and cruciferous vegetables: fibre, vitamin C, folate.
-- Sweet potato: fibre, vitamin A (beta-carotene), potassium.
-- Berries: fibre, vitamin C, antioxidants; lower in sugar than many fruits.
-- Bananas: potassium, quick energy; useful around exercise.
+Animal proteins (if you or your household eats them)
+- Chicken breast: lean protein, B vitamins.
+- Fish (e.g. salmon): protein, omega-3s, vitamin D.
+- Eggs: protein, choline, B12, vitamin D.
 
-Pantry staples
-- Canned beans: convenient protein and fibre; rinse to reduce sodium.
-- Nuts and seeds: healthy fats, protein, vitamin E, magnesium; small handfuls for portion control.
-- Olive oil: monounsaturated fat; use for cooking and dressings.
-- Canned tomatoes and tomato paste: lycopene, vitamin C; base for many meals.
+Vegetables and fruit
+- Leafy greens: vitamins A/C/K, folate, iron—pair with vitamin C for iron absorption.
+- Broccoli and brassicas: fiber, vitamin C.
+- Sweet potato: fiber, beta-carotene, potassium.
+- Berries: fiber, antioxidants; relatively lower sugar.
+- Bananas: potassium; quick energy.
 
-Use this as a reference when planning meals for more protein, fibre, or specific nutrients, and when accommodating preferences like vegetarian or low-sodium eating.
+Pantry workhorses
+- Canned beans (rinse if watching sodium).
+- Olive oil; canned tomatoes/paste; tahini, miso, spices.
+
+Use this for **vegetarian** weeks, **higher-fiber** goals, **mixed** households, or “what nutrient am I even looking at?” reference.

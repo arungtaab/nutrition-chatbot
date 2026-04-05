@@ -1,24 +1,24 @@
-# REST API contract
+# REST API
 
-Base URL (local default): `http://localhost:5000`
+Base URL locally: `http://localhost:5000`. In production, `VITE_API_BASE_URL` should match the deployed API origin.
 
-All JSON responses use UTF-8. Error responses always include an `error` string. They may include a `code` string for programmatic handling in the UI.
+UTF-8 JSON everywhere. Errors always carry an `error` string; sometimes a `code` so the UI can branch without parsing prose.
 
-## Success and error shape
+## Shapes
 
-**Chat success (200)**
+**Chat — 200**
 
 ```json
 { "reply": "string", "conversation_id": "uuid-or-string" }
 ```
 
-**Ingest success (200)**
+**Ingest — 200**
 
 ```json
 { "ingested": 42 }
 ```
 
-**History success (200)**
+**History — 200**
 
 ```json
 {
@@ -34,13 +34,13 @@ All JSON responses use UTF-8. Error responses always include an `error` string. 
 }
 ```
 
-**Health (200)**
+**Health — 200**
 
 ```json
 { "status": "ok" }
 ```
 
-**Error (non-2xx)**
+**Error — non-2xx**
 
 ```json
 {
@@ -49,35 +49,40 @@ All JSON responses use UTF-8. Error responses always include an `error` string. 
 }
 ```
 
-| HTTP | `code` (typical) | When |
-|------|------------------|------|
-| 400 | `validation_error` | Missing or empty `message`, malformed JSON |
-| 503 | `ollama_unavailable` | Ollama unreachable or model/embed failure surfaced as `RuntimeError` |
-| 500 | `rag_error` | Unexpected server/RAG failure |
+| HTTP | Typical `code` | When |
+|------|----------------|------|
+| 400 | `validation_error` | Missing/empty `message`, bad JSON |
+| 403 | `ingest_disabled` | `DISABLE_INGEST` is enabled |
+| 403 | `ingest_forbidden` | `INGEST_SECRET` set but `X-Ingest-Secret` missing or wrong |
+| 429 | `rate_limited` | Too many `POST /api/chat` (when rate limiting is on) |
+| 503 | `ollama_unavailable` | Ollama down or embed/generate blew up |
+| 500 | `rag_error` | RAG/server failure (generic text if `HIDE_INTERNAL_ERRORS` is on) |
 
 ## Endpoints
 
 ### `POST /api/chat`
 
-**Body**
+Body:
 
 ```json
 {
   "message": "User text (required)",
-  "conversation_id": "optional; omit to start a new conversation"
+  "conversation_id": "optional; omit for new thread"
 }
 ```
 
-**Behavior:** Runs RAG (retrieve from Chroma, generate via Ollama), persists user + assistant messages when persistence succeeds.
+Runs retrieval + generation, then (when persistence works) stores user + assistant rows.
 
 ### `POST /api/ingest`
 
-**Body:** Optional. Re-embeds `backend/sample_docs/*.txt` into Chroma (replaces existing collection content for the configured collection name).
+Body optional. Re-reads `backend/sample_docs/*.txt`, chunks, embeds, replaces the configured Chroma collection content.
+
+**Production:** Set `DISABLE_INGEST=true` to return **403**, or set `INGEST_SECRET` and call with header `X-Ingest-Secret` (see [backend/.env.example](../backend/.env.example)).
 
 ### `GET /api/history/<conversation_id>?limit=50`
 
-Returns recent messages for that conversation, oldest first. `limit` capped at 100.
+Messages for that conversation, oldest first. `limit` max **100**.
 
 ### `GET /health`
 
-Liveness check for the Flask process (does not verify Ollama).
+Flask liveness. It does **not** prove Ollama is happy—only that the API process answered.

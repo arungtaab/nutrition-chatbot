@@ -1,27 +1,29 @@
 # Product scope
 
-## Phase A — MVP (in this repository)
+## Phase A — what this repo actually ships
 
-Locked **Phase A** scope for portfolio and personal use:
+Phase A is the **MVP I can run on my laptop**, show on a portfolio, and use for **vegetarian meal planning** in my own lane (**no meat, poultry, fish, or eggs**), plus pantry math and “what should I cook?”—without pretending it’s a medical device.
 
-- **Chat** with a nutrition-oriented Food Planner persona (RAG-grounded).
-- **Retrieval**: embed query, similarity search over Chroma, context passed to Ollama.
-- **Generation**: local LLM via Ollama with a fixed system prompt (explain recommendations; stay on topic).
-- **Ingest**: load `backend/sample_docs/*.txt`, chunk, embed, store in Chroma (`POST /api/ingest` or documented equivalent).
-- **Persistence**: SQLite for `conversations` and `messages` (`conversation_id`, roles, content).
-- **API**: Flask REST with CORS for local Vite dev; documented error JSON for the UI.
+The same stack works for **other people** if they ingest different text and describe their own rules in chat; the **origin story** stays “I needed better vegetarian home-cooking support,” the **shape** is general-purpose RAG + chat.
 
-Out of scope for Phase A:
+- **Chat** with a nutrition-oriented Food Planner tone; answers should lean on **retrieved** text.
+- **RAG:** embed the query, similarity search in Chroma, pass context into Ollama.
+- **Generation:** local model via Ollama + a fixed system prompt (explain swaps, stay on topic, don’t play doctor).
+- **Ingest:** `backend/sample_docs/*.txt` → chunk → embed → store (`POST /api/ingest` or equivalent you document).
+- **Persistence:** SQLite for `conversations` / `messages` keyed by `conversation_id`.
+- **API:** Flask REST, CORS for local Vite (and later your prod origins), structured error JSON.
 
-- Hosted multi-user SaaS, accounts, or billing.
-- Calorie databases or verified clinical workflows.
-- Full **Life Planner** (habits, weekly rhythm UI) — see Phase B.
+**Explicitly not** in Phase A:
 
-## Phase B — Life planner extension (future)
+- Multi-tenant SaaS, auth walls, billing.
+- Verified calorie databases or clinical pathways.
+- The bigger **Life Planner** vision (habits, weekly rhythm UI)—that’s Phase B unless a job description drags it forward.
 
-Pick **one** axis first; do not ship a generic productivity suite.
+## Phase B — “life planner” (later, maybe)
 
-- **Option 1:** Weekly intentions + light rhythm (meal prep blocks, sleep/movement notes adjacent to nutrition).
-- **Option 2:** Habit stubs tied to food (e.g. Sunday prep, protein at breakfast).
+If this grows, pick **one** spine first; nobody needs another generic productivity OS.
 
-Phase B should reuse the same API style and remain optional in the README under **Future work**.
+- **Option 1:** Weekly intentions + light rhythm (prep blocks next to meals, sleep notes—adjacent, not central).
+- **Option 2:** Food-tied habits (Sunday batch, “did I eat breakfast protein?” stubs).
+
+Same API style; document Phase B under **Future work** until something ships.

@@ -39,3 +39,7 @@ htmlcov/
 
 # Local secrets (frontend)
 frontend/.env.local
+
+# Local-only planning notes (not published)
+/plan.md
+/docs/MEAL_PLAN_INTEGRATION.md

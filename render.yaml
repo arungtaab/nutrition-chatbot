@@ -1,0 +1,20 @@
+# Blueprint for https://render.com — set CORS_ORIGINS and secrets in the dashboard.
+# Ollama is not on Render by default; point OLLAMA_HOST at a reachable Ollama or swap the stack.
+
+services:
+  - type: web
+    name: nutrition-chatbot-api
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT wsgi:application
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.0"
+      - key: RATE_LIMIT_ENABLED
+        value: "true"
+      - key: HIDE_INTERNAL_ERRORS
+        value: "true"
+      - key: DISABLE_INGEST
+        value: "true"
+      # Add in dashboard: CORS_ORIGINS, OLLAMA_HOST, INGEST_SECRET (if ingest enabled)

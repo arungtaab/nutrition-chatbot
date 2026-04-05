@@ -1,36 +1,44 @@
-# Food Planner — Nutrition RAG Chatbot
+# Nourish — Food Planner (RAG chatbot)
 
-A **portfolio-friendly**, **personally useful** assistant for nutrition-oriented meal planning. The backend is a **Flask** API with **SQLite** chat history, **Chroma** vector storage, and **Ollama** for embeddings and generation (RAG). The frontend is **React (Vite)** with a distinctive **Chrome Pantry** visual system (Y2K chrome, dark pantry palette, light grain texture). See [docs/STYLE_GUIDE.md](docs/STYLE_GUIDE.md).
+**The problem, in one sentence:** I’m vegetarian (no meat, fish, poultry, or eggs). I've gotten into cooking and I wanted **meal + recipe ideas that I can trust.** I decided that I could have it **run ** locally on Ollama** with **Chroma** RAG so that it's mine first, but still fine to **demo or share** with a link.
 
-**Disclaimer:** This app provides **informational** meal-planning ideas only. It is **not medical advice**. For medical conditions, allergies, or treatment decisions, consult a qualified professional.
+I have an interest in fashion and the art-deco style, so I aimed to have **1920s / salon energy**—jewel greens, brass, paper panels—because that’s what I like to look at. Details: [docs/STYLE_GUIDE.md](docs/STYLE_GUIDE.md).
 
-## What it demonstrates
+**Live demo (swap in yours):** frontend `https://…` · API `https://…` — set `VITE_API_BASE_URL` and `CORS_ORIGINS` to match.
 
-- Python API design, configuration, and structured JSON errors (`error` + optional `code`).
-- RAG: chunking, embeddings, similarity search, grounded generation.
-- Local-first AI with Ollama; optional extension to hosted backends later.
-- Product scope split: Phase A MVP vs future “life planner” extension — [docs/MVP_SCOPE.md](docs/MVP_SCOPE.md).
+**Screenshots:** add **2–3** under [docs/screenshots/](docs/screenshots/) (landing, chat with a grounded reply, mobile) when you have captures.
 
-## Architecture
+**Disclaimer:** Nourish only gives **general meal-planning information**. It is **not** medical advice. Allergies, conditions, meds—talk to a clinician or dietitian.
 
-High-level diagram and modules: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). REST contract: [docs/API.md](docs/API.md).
+---
+
+### What you’re looking at
+
+- **Backend:** Flask, RAG ([`backend/rag_service.py`](backend/rag_service.py)), Chroma, Ollama, SQLite chat history ([`backend/database.py`](backend/database.py)). Routes: `/api/chat`, `/api/ingest`, `/api/history/...`, `/health` — see [docs/API.md](docs/API.md).
+- **Frontend:** React (Vite), chat dock inside the deco shell, history hydration when a `conversation_id` is stored (refresh-friendly).
+- **Safety:** Pattern-based refusals for sensitive prompts ([`backend/safety.py`](backend/safety.py)); visible notice in the UI.
+- **Scope:** Phase A vs later “life planner” ideas — [docs/MVP_SCOPE.md](docs/MVP_SCOPE.md).
+
+### Why not “just use ChatGPT in the browser”?
+
+The model answers **after retrieval from your ingested docs**, not from vibes alone. You control **ingest**, **prompts**, **where it runs**, and this **UI**—it’s a small product, not a single chat tab. (If you never ingest real notes, it’ll feel closer to generic chat—so feed it corpus you care about.)
+
+---
 
 ## Prerequisites
 
 - Python **3.10+**
-- Node.js **18+** and npm
-- [Ollama](https://ollama.com) installed and running locally
-
-Pull models (defaults match `backend/config.py`):
+- Node **18+** and npm
+- [Ollama](https://ollama.com) running locally (or pointed at with `OLLAMA_HOST`)
 
 ```bash
 ollama pull nomic-embed-text
 ollama pull llama3.2
 ```
 
-You can override with environment variables: `OLLAMA_EMBED_MODEL`, `OLLAMA_CHAT_MODEL`, `OLLAMA_HOST`.
+Overrides: `OLLAMA_EMBED_MODEL`, `OLLAMA_CHAT_MODEL`, `OLLAMA_HOST`.
 
-## Backend setup
+## Backend
 
 ```bash
 cd backend
@@ -40,25 +48,23 @@ pip install -r requirements.txt
 python app.py
 ```
 
-API listens on **http://localhost:5000** by default (`FLASK_HOST`, `FLASK_PORT`).
+Default API: **http://localhost:5000** (`FLASK_HOST`, `FLASK_PORT`).
 
-### Ingest sample documents (required before useful RAG)
-
-With the server running:
+### Ingest (do this once per fresh clone / after wiping Chroma)
 
 ```bash
 curl -X POST http://localhost:5000/api/ingest
 ```
 
-This reloads the `rag_docs` collection from `backend/sample_docs/*.txt`.
+Reloads vectors from `backend/sample_docs/*.txt`. If `INGEST_SECRET` is set, add `-H "X-Ingest-Secret: YOUR_SECRET"`.
 
-### Health check
+### Health
 
 ```bash
 curl http://localhost:5000/health
 ```
 
-## Frontend setup
+## Frontend
 
 ```bash
 cd frontend
@@ -66,75 +72,59 @@ npm install
 npm run dev
 ```
 
-Open **http://localhost:5173**. The dev server proxies nothing by default; CORS allows `localhost` and `127.0.0.1` on port 5173 (override with `CORS_ORIGINS` comma-separated list).
-
-### API URL
-
-Copy [frontend/.env.example](frontend/.env.example) to `frontend/.env.local` and set:
+**http://localhost:5173** — copy [frontend/.env.example](frontend/.env.example) to `frontend/.env.local`:
 
 ```bash
 VITE_API_BASE_URL=http://localhost:5000
 ```
 
-Use this when the API is on another host (e.g. future deployment).
-
-## Environment variables (reference)
+## Environment variables
 
 | Variable | Where | Purpose |
 |----------|--------|---------|
 | `OLLAMA_HOST` | backend | Default `http://localhost:11434` |
 | `OLLAMA_EMBED_MODEL` | backend | Default `nomic-embed-text` |
 | `OLLAMA_CHAT_MODEL` | backend | Default `llama3.2` |
-| `CHROMA_PATH` | backend | Vector store directory (default `chroma_db` under `backend/`) |
+| `CHROMA_PATH` | backend | Vector store dir (default `chroma_db` under `backend/`) |
 | `DB_PATH` | backend | SQLite file (default `chat_history.db` under `backend/`) |
-| `CORS_ORIGINS` | backend | Comma-separated origins (defaults include Vite dev URLs) |
-| `VITE_API_BASE_URL` | frontend | Flask base URL for `fetch` |
+| `CORS_ORIGINS` | backend | Comma-separated origins |
+| `RATE_LIMIT_ENABLED` | backend | `true` to rate-limit `POST /api/chat` in production |
+| `CHAT_RATE_LIMIT` | backend | e.g. `60 per minute` |
+| `DISABLE_INGEST` | backend | `true` → ingest returns 403 |
+| `INGEST_SECRET` | backend | If set, require `X-Ingest-Secret` on ingest |
+| `HIDE_INTERNAL_ERRORS` | backend | Generic 500 message for users |
+| `VITE_API_BASE_URL` | frontend | API base URL at build time |
 
-## Working in VS Code
+## Tests
 
-1. **Open folder:** repository root.
-2. **Python:** select `backend/.venv` interpreter ([.vscode/settings.json](.vscode/settings.json) hints a default path).
-3. **Terminals:** (a) Ollama running app-wide, (b) `python app.py` in `backend/`, (c) `npm run dev` in `frontend/`.
-4. **Debug:** “Python: Flask app.py” in [.vscode/launch.json](.vscode/launch.json).
-5. **Typical session:** health check → `POST /api/ingest` → use the chat UI.
+```bash
+cd backend && pytest tests/ -q
+cd frontend && npm test
+```
 
-## GitHub: source vs live demo
+(or your repo’s `scripts/ci.sh` if present)
 
-- **This repository** is intended as **source-of-truth** you can clone and run locally.
-- **GitHub Pages** can host the **static** Vite build only; you would still need a separate reachable API and CORS configuration.
-- For a **full hosted** stack later, use a small PaaS (Render, Railway, Fly.io, etc.) for Flask and persistent disk for Chroma/SQLite as appropriate.
+## VS Code
 
-## Portfolio assets (recommended)
+Open repo root → Python interpreter `backend/.venv` → terminals: Ollama, `python app.py`, `npm run dev`. Debug: “Python: Flask app.py” in [.vscode/launch.json](.vscode/launch.json).
 
-Add when you are happy with the UI:
+## Deploy (short version)
 
-- **Screenshots:** empty state, successful grounded reply, error state (Ollama off), narrow mobile width.
-- **Short video (60–90s):** ingest + sample chat conversation.
-
-Embed or link these from your README or portfolio site.
+Static frontend (Vercel/Netlify/etc.) + Flask on a small PaaS; set `CORS_ORIGINS` and `VITE_API_BASE_URL`. Don’t expose ingest without a secret. Turn on `RATE_LIMIT_ENABLED` when the API is public.
 
 ## Troubleshooting
 
-### `npm ERR! UNABLE_TO_GET_ISSUER_CERT_LOCALLY`
+**npm SSL errors:** `NODE_EXTRA_CA_CERTS` or `npm config set cafile` to your corporate root—avoid permanent `strict-ssl false`.
 
-Common on networks with SSL inspection. Prefer fixing trust:
+**Ollama errors:** service up? models pulled? Response JSON `code` e.g. `ollama_unavailable`.
 
-```bash
-export NODE_EXTRA_CA_CERTS="/path/to/your/corp-root.pem"
-```
+**Weak answers:** run `/api/ingest`; add richer `.txt` files under `backend/sample_docs/`.
 
-Or `npm config set cafile /path/to/your/corp-root.pem`. Avoid leaving `strict-ssl false` in place long-term.
+## Architecture & resume packaging
 
-### Ollama errors in the UI
-
-- Ensure Ollama is running and models are pulled.
-- Check browser/API response body for `error` and `code` (`ollama_unavailable`).
-
-### Empty or weak answers
-
-- Run `/api/ingest` after clearing `chroma_db` or on first clone.
-- Add richer content to `backend/sample_docs/`.
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)  
+- RAG spot-checks: [docs/rag_golden.md](docs/rag_golden.md) (if present)
 
 ## License
 
-Specify a license if you open-source publicly (e.g. MIT). This README does not impose one by default.
+[MIT](LICENSE). Third-party assets (e.g. Freepik illustrations) stay under their own licenses—see [frontend/public/illustrations/ATTRIBUTION.txt](frontend/public/illustrations/ATTRIBUTION.txt).
