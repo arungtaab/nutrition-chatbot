@@ -1,12 +1,14 @@
 """
-RAG service: load docs, chunk, embed with Ollama, store in Chroma;
+RAG service: load docs, chunk, embed with Ollama, store in Chroma or SQLite;
 on query: embed, retrieve top-k, build prompt, generate with Ollama.
 """
+import heapq
+import json
+import math
 import pathlib
 import re
+import sqlite3
 import requests
-import chromadb
-from chromadb.config import Settings as ChromaSettings
 
 from config import (
     OLLAMA_HOST,
@@ -18,6 +20,8 @@ from config import (
     CHUNK_OVERLAP,
     TOP_K,
     SAMPLE_DOCS_DIR,
+    SQLITE_RAG_PATH,
+    VECTOR_STORE,
 )
 
 SYSTEM_PROMPT = """You are a nutrition-oriented Food Planner assistant. Use only the context below to support your answers—if context is thin, say so and avoid inventing precise nutrient claims.
@@ -40,6 +44,32 @@ def _get_chroma_path():
     if not p.is_absolute():
         p = _backend_dir() / p
     return str(p)
+
+
+def _get_sqlite_rag_path():
+    p = pathlib.Path(SQLITE_RAG_PATH)
+    if not p.is_absolute():
+        p = _backend_dir() / p
+    return str(p)
+
+
+def _use_sqlite_vector():
+    return VECTOR_STORE == "sqlite"
+
+
+def _cosine_similarity(a: list[float], b: list[float]) -> float:
+    if len(a) != len(b) or not a:
+        return -1.0
+    dot = 0.0
+    na = 0.0
+    nb = 0.0
+    for x, y in zip(a, b):
+        dot += x * y
+        na += x * x
+        nb += y * y
+    if na <= 0 or nb <= 0:
+        return -1.0
+    return dot / (math.sqrt(na) * math.sqrt(nb))
 
 
 def _chunk_text(text: str, chunk_size: int = CHUNK_SIZE, overlap: int = CHUNK_OVERLAP):
@@ -117,9 +147,80 @@ def embed_with_ollama(texts: list[str]) -> list[list[float]]:
         raise RuntimeError(f"Ollama embed request failed: {e}") from e
 
 
+def _sqlite_init(conn):
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS rag_chunks (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            source TEXT NOT NULL,
+            text TEXT NOT NULL,
+            embedding_json TEXT NOT NULL
+        )
+        """
+    )
+    conn.commit()
+
+
+def ingest_docs_sqlite(chunks_with_meta: list, vectors: list[list[float]]):
+    path = _get_sqlite_rag_path()
+    conn = sqlite3.connect(path, check_same_thread=False)
+    try:
+        _sqlite_init(conn)
+        conn.execute("DELETE FROM rag_chunks")
+        rows = [
+            (src, text, json.dumps(vec))
+            for (text, src), vec in zip(chunks_with_meta, vectors)
+        ]
+        conn.executemany(
+            "INSERT INTO rag_chunks (source, text, embedding_json) VALUES (?, ?, ?)",
+            rows,
+        )
+        conn.commit()
+    finally:
+        conn.close()
+
+
+def query_sqlite(query: str, top_k: int = TOP_K) -> list[str]:
+    vectors = embed_with_ollama([query])
+    if not vectors:
+        return []
+    qv = vectors[0]
+    path = _get_sqlite_rag_path()
+    if not pathlib.Path(path).is_file():
+        return []
+    conn = sqlite3.connect(path, check_same_thread=False)
+    try:
+        cur = conn.execute("SELECT text, embedding_json FROM rag_chunks")
+        rows = cur.fetchall()
+    finally:
+        conn.close()
+    if not rows:
+        return []
+    scored = []
+    for text, emb_json in rows:
+        try:
+            vec = json.loads(emb_json)
+            if not isinstance(vec, list):
+                continue
+            vec_f = [float(x) for x in vec]
+        except (json.JSONDecodeError, TypeError, ValueError):
+            continue
+        scored.append((_cosine_similarity(qv, vec_f), text))
+    k = min(top_k, len(scored))
+    if k == 0:
+        return []
+    top = heapq.nlargest(k, scored, key=lambda t: t[0])
+    return [t[1] for t in top]
+
+
 def get_client():
     """Persistent Chroma client pointing at CHROMA_PATH."""
-    return chromadb.PersistentClient(path=_get_chroma_path(), settings=ChromaSettings(anonymized_telemetry=False))
+    import chromadb
+    from chromadb.config import Settings as ChromaSettings
+
+    return chromadb.PersistentClient(
+        path=_get_chroma_path(), settings=ChromaSettings(anonymized_telemetry=False)
+    )
 
 
 def ensure_collection(client):
@@ -131,7 +232,7 @@ def ensure_collection(client):
 
 
 def ingest_docs(docs_dir: pathlib.Path = None):
-    """Load docs from dir, embed, add to Chroma. If docs_dir is None, use SAMPLE_DOCS_DIR."""
+    """Load docs from dir, embed, add to vector store. If docs_dir is None, use SAMPLE_DOCS_DIR."""
     if docs_dir is None:
         docs_dir = _backend_dir() / SAMPLE_DOCS_DIR
     chunks_with_meta = load_docs(docs_dir)
@@ -139,6 +240,9 @@ def ingest_docs(docs_dir: pathlib.Path = None):
         return 0
     texts = [c[0] for c in chunks_with_meta]
     vectors = embed_with_ollama(texts)
+    if _use_sqlite_vector():
+        ingest_docs_sqlite(chunks_with_meta, vectors)
+        return len(texts)
     client = get_client()
     try:
         client.delete_collection(CHROMA_COLLECTION)
@@ -153,6 +257,8 @@ def ingest_docs(docs_dir: pathlib.Path = None):
 
 def query_chroma(query: str, top_k: int = TOP_K) -> list[str]:
     """Embed query, run similarity search, return list of document strings."""
+    if _use_sqlite_vector():
+        return query_sqlite(query, top_k=top_k)
     vectors = embed_with_ollama([query])
     if not vectors:
         return []

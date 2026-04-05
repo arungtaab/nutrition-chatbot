@@ -2,8 +2,4 @@ Assets in this folder:
 - chat-flank-left.png
 - chat-flank-right.png
 
-Source: Freepik — vintage feminine fashion vectors (George Barbier–style remix). I stripped the backgrounds so they sit cleanly beside the chat column.
-
-Freepik asks you to show “Designed by Freepik” on the product (footer on the site + https://www.freepik.com).
-
-Follow whatever Freepik license applies to the asset tier in use (free vs Premium, commercial terms, etc.); license terms can change.
+Source: Designed by Freepik — "vintage feminine fashion vectors (George Barbier–style remix)". I stripped the backgrounds so they sit cleanly beside the chat column.

@@ -5,9 +5,15 @@ OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://localhost:11434")
 OLLAMA_EMBED_MODEL = os.environ.get("OLLAMA_EMBED_MODEL", "nomic-embed-text")
 OLLAMA_CHAT_MODEL = os.environ.get("OLLAMA_CHAT_MODEL", "llama3.2")
 
+# Vector index: "chroma" (default) or "sqlite" (tiny disk footprint, no chromadb package)
+VECTOR_STORE = os.environ.get("VECTOR_STORE", "chroma").strip().lower() or "chroma"
+
 # Chroma vector store (relative to backend dir)
 CHROMA_PATH = os.environ.get("CHROMA_PATH", "chroma_db")
 CHROMA_COLLECTION = "rag_docs"
+
+# SQLite-backed RAG chunks when VECTOR_STORE=sqlite (relative to backend dir)
+SQLITE_RAG_PATH = os.environ.get("SQLITE_RAG_PATH", "rag_vectors.db")
 
 # SQLite chat history
 DB_PATH = os.environ.get("DB_PATH", "chat_history.db")

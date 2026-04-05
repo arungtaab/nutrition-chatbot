@@ -54,11 +54,7 @@ export default function App() {
           <p className="deco-trust-body">
             This chat offers general food and diet information only. It is not
             medical advice and does not replace a clinician or registered
-            dietitian. It is also not for extreme restriction, purging, or other
-            harmful eating-disorder behaviors—the app may refuse those topics.
-            If food or body image feels overwhelming, consider reaching out to
-            a qualified professional; in the U.S., NEDA (nationaleatingdisorders.org)
-            and 988 offer support.
+            dietitian.
           </p>
         </aside>
 

@@ -1,0 +1,6 @@
+# For space-constrained hosts (e.g. PythonAnywhere free tier): no chromadb.
+# Set VECTOR_STORE=sqlite in the environment / WSGI file.
+flask>=3.0.0
+flask-cors>=4.0.0
+flask-limiter>=3.8.0
+requests>=2.31.0
