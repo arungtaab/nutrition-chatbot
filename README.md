@@ -1,6 +1,6 @@
 # Nourish — Food Planner (RAG chatbot)
 
-**Idea behind it:** I’m vegetarian (no meat, fish, poultry, or eggs). I've gotten into cooking and I wanted **meal + recipe ideas that I can trust.** I decided that I could have it **run** locally on Ollama** with **Chroma** RAG so that it's mine first, but still fine to **demo or share** with a link.
+**Idea behind it:** I’m vegetarian (no meat, fish, poultry, or eggs). I've gotten into cooking and I wanted **meal + recipe ideas that I can trust.** I decided that I could have it **run** locally on **Ollama** with **Chroma** RAG so that it's mine first, but still fine to **demo or share** with a link.
 
 I have an interest in fashion and the art-deco style, so I aimed to have **1920s / salon energy**—jewel greens, brass, paper panels—because that’s what I like to look at. Details: [docs/STYLE_GUIDE.md](docs/STYLE_GUIDE.md).
 
