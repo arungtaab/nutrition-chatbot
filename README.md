@@ -6,7 +6,23 @@ I have an interest in fashion and the art-deco style, so I aimed to have **1920s
 
 **Live demo (swap in yours):** frontend `https://…` · API `https://…` — set `VITE_API_BASE_URL` and `CORS_ORIGINS` to match.
 
-**Screenshots:** add **2–3** under [docs/screenshots/](docs/screenshots/) (landing, chat with a grounded reply, mobile) when you have captures.
+## Screenshots
+
+**Landing**
+
+![Nourish landing — art-deco hero and intro copy](docs/screenshots/top_screenshot.png)
+
+**Chat (empty state)**
+
+![Chat dock before the first message](docs/screenshots/empty_chat_screenshot.png)
+
+**Chat (conversation)**
+
+![Chat with a user message and assistant reply](docs/screenshots/prompted_chat_screenshot.png)
+
+**Meal plan view**
+
+![Weekly meal plan panel beside the chat UI](docs/screenshots/meal_plan_screenshot.png)
 
 **Disclaimer:** Nourish only gives **general meal-planning information**. It is **not** medical advice. Allergies, conditions, meds—talk to a clinician or dietitian.
 
