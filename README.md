@@ -20,8 +20,6 @@ I have an interest in fashion and the art-deco style, so I aimed to have **1920s
 
 ![Chat with a user message and assistant reply](docs/screenshots/prompted_chat_screenshot.png)
 
-**Meal plan view**
-
 ![Weekly meal plan panel beside the chat UI](docs/screenshots/meal_plan_screenshot.png)
 
 **Disclaimer:** Nourish only gives **general meal-planning information**. It is **not** medical advice. Allergies, conditions, meds—talk to a clinician or dietitian.
